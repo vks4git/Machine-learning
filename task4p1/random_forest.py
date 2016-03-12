@@ -11,7 +11,7 @@ class RandomForest:
         self._trees = []
         self._masks = []
 
-    def learn(self, data, types):
+    def fit(self, data, types):
         self._trees = []
         self._masks = []
         features = max(1, round(self._features * len(data[0])))
@@ -36,16 +36,16 @@ class RandomForest:
                         vec.append(data[ind][k])
                 data_x.append(vec)
                 data_y.append(types[ind])
-            self._trees[iter].learn(data_x, data_y)
+            self._trees[iter].fit(data_x, data_y)
 
-    def classify(self, element):
+    def predict(self, element):
         votes = {}
         for i in range(self._size):
             vec = []
             for j in range(len(element)):
                 if self._masks[i][j]:
                     vec.append(element[j])
-            vote = self._trees[i].classify(vec)
+            vote = self._trees[i].predict(vec)
             if vote not in votes.keys():
                 votes[vote] = 1
             else:

@@ -23,13 +23,13 @@ class Tree:
         self._threshold = threshold
         self._gain_func = gain_func
 
-    def learn(self, data, categories):
+    def fit(self, data, categories):
         self._data = data
         self._categories = categories
         self._root = Node()
         self._build_tree(data, categories, self._root)
 
-    def classify(self, element):
+    def predict(self, element):
         if self._root is None:
             return None
         current = self._root
