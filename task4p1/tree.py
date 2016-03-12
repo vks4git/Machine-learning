@@ -115,15 +115,18 @@ class Tree:
         feature = -1
         key = -1
         gain = 0
+        dataset = [(data[i], categories[i]) for i in range(len(categories))]
         for i in range(len(data[0])):
+            dataset.sort(key=lambda x: x[0][i])
             cat_left = []
-            cat_right = []
-            for j in range(len(categories) - 1):
-                for k in range(len(categories)):
-                    if data[k][i] <= data[j][i]:
-                        cat_left.append(categories[k])
-                    else:
-                        cat_right.append(categories[k])
+            cat_right = [j[1] for j in dataset]
+            ind = 0
+            while len(cat_right) > 0:
+                cat_left.append(cat_right.pop())
+                ind += 1
+                while len(cat_right) > 0 and dataset[ind][0][i] == dataset[ind - 1][0][i]:
+                    cat_left.append(cat_right.pop())
+                    ind += 1
                 test_gain = 0.0
                 if self._gain_func == 'entropy':
                     test_gain = self._entropy(categories) - \
@@ -136,5 +139,5 @@ class Tree:
                 if test_gain > gain:
                     gain = test_gain
                     feature = i
-                    key = data[j][i]
+                    key = dataset[ind - 1][0][i]
         return feature, key, gain

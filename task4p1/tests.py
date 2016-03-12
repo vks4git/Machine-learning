@@ -7,6 +7,6 @@ __author__ = 'vks'
 with open("iris.txt", "rb") as f:
     data, types = pickle.load(f, encoding="latin-1")
 
-forest = RandomForest(size=200, features=0.2)
+forest = RandomForest(size=2000, features=0.2)
 print(k_fold(10, data, types, forest))
 
