@@ -19,9 +19,14 @@ class Tree:
         self._cut_edges = cut_edges
         self._data = []
         self._categories = []
+        self._cat_right = {}
+        self._cat_left = {}
         self._root = None
         self._threshold = threshold
-        self._gain_func = gain_func
+        if gain_func == 'gini':
+            self._gain_func = self._gini
+        elif gain_func == 'entropy':
+            self._gain_func = self._entropy
 
     def fit(self, data, categories):
         self._data = data
@@ -87,28 +92,62 @@ class Tree:
         self._build_tree(data_left, categories_left, node.left)
         self._build_tree(data_right, categories_right, node.right)
 
-    def _gini(self, categories):
-        cat = {}
-        for x in categories:
-            if x not in cat:
-                cat[x] = 1
-            else:
-                cat[x] += 1
+    def _gini(self, mode, diff, size):
+        if size == 0:
+            return 1
         ans = 0
-        for v in cat.values():
-            ans += (v / len(categories)) ** 2
+        if mode == 'right':
+            for x in diff:
+                self._cat_right[x] -= 1
+            for v in self._cat_right.values():
+                ans += (v / size) ** 2
+        elif mode == 'left':
+            for x in diff:
+                if x not in self._cat_left:
+                    self._cat_left[x] = 1
+                else:
+                    self._cat_left[x] += 1
+            for v in self._cat_left.values():
+                ans += (v / size) ** 2
+        elif mode == 'init':
+            self._cat_right.clear()
+            self._cat_left.clear()
+            for x in diff:
+                if x not in self._cat_right:
+                    self._cat_right[x] = 1
+                else:
+                    self._cat_right[x] += 1
+            for v in self._cat_right.values():
+                ans += (v / size) ** 2
         return 1 - ans
 
-    def _entropy(self, categories):
-        cat = {}
-        for x in categories:
-            if x not in cat:
-                cat[x] = 1
-            else:
-                cat[x] += 1
+    def _entropy(self, mode, diff, size):
+        if size == 0:
+            return 1
         ans = 0
-        for v in cat.values():
-            ans -= v / len(categories) * math.log(v / len(categories), 2)
+        if mode == 'right':
+            for x in diff:
+                self._cat_right[x] -= 1
+            for v in self._cat_right.values():
+                ans -= v / size * math.log(v / size, 2)
+        elif mode == 'left':
+            for x in diff:
+                if x not in self._cat_left:
+                    self._cat_left[x] = 1
+                else:
+                    self._cat_left[x] += 1
+            for v in self._cat_left.values():
+                ans -= v / size * math.log(v / size, 2)
+        elif mode == 'init':
+            self._cat_right.clear()
+            self._cat_left.clear()
+            for x in diff:
+                if x not in self._cat_right:
+                    self._cat_right[x] = 1
+                else:
+                    self._cat_right[x] += 1
+            for v in self._cat_right.values():
+                ans -= v / size * math.log(v / size, 2)
         return ans
 
     def _gain(self, data, categories):
@@ -116,26 +155,21 @@ class Tree:
         key = -1
         gain = 0
         dataset = [(data[i], categories[i]) for i in range(len(categories))]
+        size = len(categories)
         for i in range(len(data[0])):
             dataset.sort(key=lambda x: x[0][i])
-            cat_left = []
             cat_right = [j[1] for j in dataset]
+            overall_gain = self._gain_func('init', cat_right, size)
             ind = 0
             while len(cat_right) > 0:
-                cat_left.append(cat_right.pop())
+                diff = [cat_right.pop()]
                 ind += 1
                 while len(cat_right) > 0 and dataset[ind][0][i] == dataset[ind - 1][0][i]:
-                    cat_left.append(cat_right.pop())
+                    diff.append(cat_right.pop())
                     ind += 1
-                test_gain = 0.0
-                if self._gain_func == 'entropy':
-                    test_gain = self._entropy(categories) - \
-                                len(cat_left) / len(categories) * self._entropy(cat_left) - \
-                                len(cat_right) / len(categories) * self._entropy(cat_right)
-                elif self._gain_func == 'gini':
-                    test_gain = self._gini(categories) - \
-                                len(cat_left) / len(categories) * self._gini(cat_left) - \
-                                len(cat_right) / len(categories) * self._gini(cat_right)
+                test_gain = overall_gain - \
+                            ind / size * self._gain_func('left', diff, ind) - \
+                            len(cat_right) / size * self._gain_func('right', diff, len(cat_right))
                 if test_gain > gain:
                     gain = test_gain
                     feature = i
