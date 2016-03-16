@@ -1,5 +1,6 @@
 from tree import Tree
 from random import uniform
+from time import time
 
 __author__ = 'vks'
 
