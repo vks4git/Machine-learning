@@ -4,6 +4,7 @@ from import_labs import import_labs
 from time import time
 import warnings
 from skimage.feature import hog
+from random import uniform
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -78,9 +79,21 @@ def validate(model, data, name):
           (name, finish - start, errors, errors / 100))
 
 
+def extend(data, labels, new_data, new_labels):
+    for iter in range(5000):
+        i = int(uniform(0, len(new_data) - 1))
+        data.append(new_data[i])
+        labels.append(new_labels[i])
+
+
+train_images_hog = [x for x in train_images_hog]
+train_labels = [x for x in train_labels]
+
 img_shift_x0y1 = shift("y", 1, test_images)
 img_shift_x0y1_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
                       for img in img_shift_x0y1]
+
+extend(train_images_hog, train_labels, img_shift_x0y1_hog, test_labels)
 
 img_shift_x0y5 = shift("y", 5, test_images)
 img_shift_x0y5_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
