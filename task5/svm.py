@@ -134,13 +134,8 @@ class SVM_Linear_Multiclass:
     def predict(self, x):
         votes = [0] * self._count
         for i in range(self._count):
-            if self._classificators[i].predict(x) == 1:
-                votes[i] += 1
-            else:
-                for j in range(self._count):
-                    if i != j:
-                        votes[j] += 1
-        ans = 0
+            votes[i] += self._classificators[i].predict(x)
+        ans = -2 ** 256
         for i in votes:
             ans = max(ans, i)
         for i in range(len(votes)):
@@ -171,13 +166,8 @@ class SVM_Nonlinear_Multiclass:
     def predict(self, x):
         votes = [0] * self._count
         for i in range(self._count):
-            if self._classificators[i].predict(x) == 1:
-                votes[i] += 1
-            else:
-                for j in range(self._count):
-                    if i != j:
-                        votes[j] += 1
-        ans = 0
+            votes[i] += self._classificators[i].predict(x)
+        ans = -2 ** 256
         for i in votes:
             ans = max(ans, i)
         for i in range(len(votes)):

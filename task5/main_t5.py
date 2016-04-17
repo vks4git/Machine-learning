@@ -2,6 +2,7 @@ import idx2numpy
 from skimage.feature import hog
 from time import time
 from sklearn import datasets
+from numpy import array
 
 px_x = 2
 px_y = 2
@@ -15,12 +16,12 @@ for i in range(150):
         iris_y.append(iris.target[i])
 
 train_images = idx2numpy.convert_from_file("train-images.idx3-ubyte")
-train_images_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                    for img in train_images]
+train_images_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                          for img in train_images])
 train_labels = idx2numpy.convert_from_file("train-labels.idx1-ubyte")
 test_images = idx2numpy.convert_from_file("t10k-images.idx3-ubyte")
-test_images_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                   for img in test_images]
+test_images_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                         for img in test_images])
 test_labels = idx2numpy.convert_from_file("t10k-labels.idx1-ubyte")
 
 
@@ -73,44 +74,42 @@ def validate(model, data, name):
           (name, finish - start, errors, errors / 100))
 
 
-print("Loading complete. Transforming images...")
+print("Loading completed. Transforming images...")
 
-train_images_hog = [x for x in train_images_hog]
-train_labels = [x for x in train_labels]
+img_shift_x0y1 = array(shift("y", 1, test_images))
+img_shift_x0y1_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                            for img in img_shift_x0y1])
 
-img_shift_x0y1 = shift("y", 1, test_images)
-img_shift_x0y1_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                      for img in img_shift_x0y1]
+img_shift_x0y5 = array(shift("y", 5, test_images))
+img_shift_x0y5_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                            for img in img_shift_x0y5])
 
-img_shift_x0y5 = shift("y", 5, test_images)
-img_shift_x0y5_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                      for img in img_shift_x0y5]
+img_shift_x0y10 = array(shift("y", 10, test_images))
+img_shift_x0y10_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                             for img in img_shift_x0y10])
 
-img_shift_x0y10 = shift("y", 10, test_images)
-img_shift_x0y10_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                       for img in img_shift_x0y10]
+img_shift_x1y0 = array(shift("x", 1, test_images))
+img_shift_x1y0_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                            for img in img_shift_x1y0])
 
-img_shift_x1y0 = shift("x", 1, test_images)
-img_shift_x1y0_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                      for img in img_shift_x1y0]
+img_shift_x5y0 = array(shift("x", 5, test_images))
+img_shift_x5y0_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                            for img in img_shift_x5y0])
 
-img_shift_x5y0 = shift("x", 5, test_images)
-img_shift_x5y0_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                      for img in img_shift_x5y0]
+img_shift_x10y0 = array(shift("x", 10, test_images))
+img_shift_x10y0_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                             for img in img_shift_x10y0])
 
-img_shift_x10y0 = shift("x", 10, test_images)
-img_shift_x10y0_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
-                       for img in img_shift_x10y0]
+img_rotate = array(rotate(test_images))
+img_rotate_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                        for img in img_rotate])
 
-img_rotate = rotate(test_images)
-img_rotate_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1)) for img in img_rotate]
+img_flip_x = array(flip("x", test_images))
+img_flip_x_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                        for img in img_flip_x])
 
-img_flip_x = flip("x", test_images)
-img_flip_x_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1)) for img in img_flip_x]
-
-img_flip_y = flip("y", test_images)
-img_flip_y_hog = [hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1)) for img in img_flip_y]
+img_flip_y = array(flip("y", test_images))
+img_flip_y_hog = array([hog(img, orientations=8, pixels_per_cell=(px_x, px_y), cells_per_block=(1, 1))
+                        for img in img_flip_y])
 
 print("Transformation completed.")
-
-
