@@ -8,11 +8,11 @@ images = numpy.reshape(convert_from_file("train-images.idx3-ubyte"), (60000, 784
 labels = convert_from_file("train-labels.idx1-ubyte")
 images = numpy.multiply(images, 1 / 255)
 
-# kmeans = K_means(10, 1)
-# kmeans.fit(images)
-# print(kmeans.score(labels))
+kmeans = K_means(10, 1)
+kmeans.fit(numpy.array([images[i] for i in range(5000)]))
+print(kmeans.score(numpy.array([labels[i] for i in range(5000)])))
 
-dbscan = DBScan(7, 78)
-dbscan.fit(numpy.array([images[i] for i in range(1000)]))
-print(dbscan.score(numpy.array([labels[i] for i in range(1000)])))
-print(dbscan.clusters())
+#dbscan = DBScan(4.795, 50)
+#dbscan.fit(numpy.array([images[i] for i in range(1000)]))
+#print(dbscan.score(numpy.array([labels[i] for i in range(1000)])))
+#print(dbscan.clusters())
