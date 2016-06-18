@@ -95,3 +95,6 @@ def passThroughGenerativeModel(x, gen):
         res.append(expit(numpy.dot(numpy.maximum(numpy.dot(x[i], gen.layers[0].get_weights()[0]), 0),
                                    gen.layers[2].get_weights()[0])))
     return numpy.array(res)
+
+
+evaluate(1 / 3, 20, 3000, 9, save_model=True)
